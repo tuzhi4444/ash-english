@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 内联 data URI，保证构建产物是真正的单文件（拷到任何地方双击即用） -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%A7%3C/text%3E%3C/svg%3E"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#4A90D9" />
+    <!-- 标题与下面的兜底提示都只在开发时存在，构建时由 vite.config.ts 的
+         stripDevFallback 插件替换/剥除，产物里不会带上 -->
+    <title>[开发入口] Ash英语 · 请勿直接打开</title>
+  </head>
+  <body>
+    <!--
+      #root 里的内容是"打开错文件"的兜底提示。
+      经 Vite 跑起来时 React 会把它整个替换掉，用户看不到；
+      而被双击打开时（file:// 协议）下面的 module 脚本必然加载失败——
+      浏览器会去找 file:///src/main.tsx，且 .tsx 本来也不能直接执行——
+      于是提示留在原地。没有它就是一片纯白，没人猜得到发生了什么。
+    -->
+    <div id="root">
+      <!--dev-fallback-start-->
+      <div style="max-width:480px;margin:40px auto;padding:24px;font-family:-apple-system,'PingFang SC',sans-serif;line-height:1.7;">
+        <h2 style="color:#F44336;margin-bottom:12px;">⚠️ 这个文件不是用来打开的</h2>
+        <p style="margin-bottom:12px;">你打开的是<strong>开发入口</strong>（源码），它必须由开发服务器运行，直接双击只会白屏。</p>
+        <p style="margin-bottom:12px;">要用 app，请打开这个文件：</p>
+        <p style="background:#f1f3f5;padding:12px;border-radius:8px;font-family:monospace;margin-bottom:12px;">dist/Ash英语.html</p>
+        <p style="color:#6c757d;font-size:14px;">（在同目录的 <strong>dist</strong> 文件夹里。那是个自包含的单文件，拷到任何地方双击即用。）</p>
+      </div>
+      <!--dev-fallback-end-->
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

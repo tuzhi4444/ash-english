@@ -1,0 +1,65 @@
+name: Build and Deploy to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 允许手动触发
+
+# Pages 部署所需的最小权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间只跑一个部署；新的推送不打断正在进行的部署
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # 注意用 tsc -b：根 tsconfig 是 files:[] + references 结构，
+      # 裸跑 tsc --noEmit 一个文件都不检查、永远退出 0
+      - name: 类型检查
+        run: npx tsc -b --force
+
+      - name: 构建
+        run: npm run build
+
+      # 构建产物是 dist/Ash英语.html（中文名便于本地双击/发给别人），
+      # 但 Pages 要用 index.html 才能在根路径直接打开，所以再复制一份。
+      - name: 准备 Pages 产物
+        run: |
+          cp "dist/Ash英语.html" dist/index.html
+          ls -lh dist/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
