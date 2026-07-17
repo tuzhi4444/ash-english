@@ -5,7 +5,14 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { useNotification } from './hooks/useNotification';
 import { STORAGE_KEY } from './utils/backup';
 import { defaultStore } from './utils/store';
-import { applyPhaseGate, completeTask, refreshPlan, todayStr } from './utils/plan';
+import {
+  applyPhaseGate,
+  completeTask,
+  emptyCompletion,
+  getDailyTarget,
+  refreshPlan,
+  todayStr,
+} from './utils/plan';
 import { getWordQuota, hasFreshWords } from './utils/srs';
 import { WORDS } from './data/words';
 import { migrateStore } from './utils/migrate';
@@ -22,6 +29,15 @@ import DialoguePractice from './components/Dialogue';
 import Stats from './components/Stats';
 import Settings from './components/Settings';
 import WordBrowser from './components/WordBrowser';
+
+// 五项任务的固定顺序（= 首页面板顺序）。做满一项自动跳到下一项未完成的。
+const TASK_ORDER: { key: keyof DailyCompletion; view: View; name: string }[] = [
+  { key: 'words', view: 'words', name: '单词学习' },
+  { key: 'framework', view: 'framework', name: '框架造句' },
+  { key: 'shadowing', view: 'shadowing', name: 'Shadowing' },
+  { key: 'listening', view: 'listening', name: '听辨训练' },
+  { key: 'dialogue', view: 'dialogue', name: '对话模拟' },
+];
 
 // 底部栏 = 页面导航（去哪个页面），练习模式一律从首页的通关面板进。
 // 早先这里放的是单词/框架/跟读，和面板里的任务重复了，故改成页面级入口。
@@ -40,6 +56,12 @@ export default function App(): React.JSX.Element {
     migrateStore
   );
   const [view, setView] = useState<View>('home');
+  // 做满一项后的过渡提示：闪一下"✅ 本项完成"，再自动跳到下一项
+  const [taskBanner, setTaskBanner] = useState<{
+    finishedName: string;
+    nextView: View;
+    nextName: string | null;
+  } | null>(null);
   const notification = useNotification();
   const sessionStart = useRef(Date.now());
   const refreshed = useRef(false);
@@ -89,11 +111,24 @@ export default function App(): React.JSX.Element {
   /**
    * 给当前关卡的某项任务记一笔完成量（每答一题调一次）。
    * 五项都做满目标时 completeTask 会自动通关并推进 planDay。
+   * 某一项刚好做满时，闪一下提示并自动跳到下一项未完成的练习。
    */
   const markTask = useCallback(
     (key: keyof DailyCompletion, amount = 1) => {
+      const quota = getWordQuota(
+        WORDS,
+        store.words,
+        store.plan.calendarDay,
+        store.settings.dailyNewWords,
+        store.settings.maxReviewPerDay
+      );
+      const target = getDailyTarget(store.plan.currentPhase, store.plan.mode, quota);
+      const cur = store.plan.levels[store.plan.activeLevel] ?? emptyCompletion();
+      const before = cur[key];
+      const after = before + amount;
+
       update((prev) => {
-        const quota = getWordQuota(
+        const q = getWordQuota(
           WORDS,
           prev.words,
           prev.plan.calendarDay,
@@ -101,14 +136,44 @@ export default function App(): React.JSX.Element {
           prev.settings.dailyNewWords,
           prev.settings.maxReviewPerDay
         );
-        const plan = completeTask(prev.plan, prev.plan.activeLevel, key, amount, quota);
+        const plan = completeTask(prev.plan, prev.plan.activeLevel, key, amount, q);
         // 通关可能跨过阶段线，这里补一次门槛判定；
         // 否则要等到下次打开 app 才升级
         return { ...prev, plan: applyPhaseGate(plan, prev.words) };
       });
+
+      // 本项从"没做满"变成"刚做满"→ 跳到下一项未完成的练习
+      const justFinished = target[key] > 0 && before < target[key] && after >= target[key];
+      if (justFinished) {
+        const idx = TASK_ORDER.findIndex((t) => t.key === key);
+        const isUnfinished = (t: (typeof TASK_ORDER)[number]): boolean => {
+          const done = t.key === key ? after : (cur[t.key] ?? 0);
+          return target[t.key] > 0 && done < target[t.key];
+        };
+        // 先往后找（顺着做下去），后面都做完了再回头找前面漏的，全做完则回首页
+        const next =
+          TASK_ORDER.slice(idx + 1).find(isUnfinished) ??
+          TASK_ORDER.slice(0, idx).find(isUnfinished) ??
+          null;
+        setTaskBanner({
+          finishedName: TASK_ORDER[idx]?.name ?? '本项',
+          nextView: next ? next.view : 'home',
+          nextName: next ? next.name : null,
+        });
+      }
     },
-    [update]
+    [store, update]
   );
+
+  // 过渡提示显示约 1.2 秒后自动跳转
+  useEffect(() => {
+    if (!taskBanner) return;
+    const id = window.setTimeout(() => {
+      setView(taskBanner.nextView);
+      setTaskBanner(null);
+    }, 1200);
+    return () => window.clearTimeout(id);
+  }, [taskBanner]);
 
   /** 从关卡列表选一关：只允许已通关的（回刷）或当前关 */
   const selectLevel = useCallback(
@@ -168,6 +233,17 @@ export default function App(): React.JSX.Element {
 
   return (
     <>
+      {taskBanner && (
+        <div className="task-done-overlay">
+          <div className="task-done-card">
+            <div className="task-done-check">✅</div>
+            <div className="task-done-title">{taskBanner.finishedName} 完成</div>
+            <div className="task-done-next">
+              {taskBanner.nextName ? `进入 ${taskBanner.nextName} …` : '今日五项全部完成 🎉'}
+            </div>
+          </div>
+        </div>
+      )}
       {view === 'home' && <Home store={store} onNavigate={setView} />}
       {view === 'levels' && (
         <Levels store={store} onSelect={selectLevel} onBack={back} />

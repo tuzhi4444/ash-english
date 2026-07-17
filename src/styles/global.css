@@ -754,3 +754,45 @@ body {
   display: block;
   margin-bottom: 8px;
 }
+
+/* 做满一项任务后的过渡提示：闪现后自动跳到下一项 */
+.task-done-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.15s ease;
+}
+.task-done-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28px 36px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.2s ease;
+}
+.task-done-check {
+  font-size: 44px;
+  margin-bottom: 8px;
+}
+.task-done-title {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+}
+.task-done-next {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-light);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
