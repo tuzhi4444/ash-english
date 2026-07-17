@@ -190,7 +190,7 @@ export const PHASE3: Passage[] = [
     ['My father has always been the strongest man I knew.', '父亲一直是我认识的最强壮的人。'],
     ['Last month I saw him stop to rest on the stairs.', '上个月我看见他在楼梯上停下来休息。'],
     ['He said nothing, and neither did I.', '他什么也没说，我也是。'],
-    ['That evening I booked a check for him at the hospital.', '那天晚上我给他约了医院检查。'],
+    ['That evening I booked a check-up for him at the hospital.', '那天晚上我给他约了医院检查。'],
     ['Some things cannot be talked about, only done.', '有些事没法说，只能做。'],
   ], [
     ['他看到父亲怎么了？', ['在楼梯上停下休息', '摔倒了', '生病了', '瘦了']],
