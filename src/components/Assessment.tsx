@@ -100,7 +100,7 @@ export default function Assessment({ onFinish }: Props): React.JSX.Element {
             欢迎！这套训练用「听音 → 建反射 → 框架输出」代替背单词扣语法。
           </p>
           <p style={{ marginBottom: 12 }}>
-            每天一关，四项任务做满才算过关。不限天数——进度由你的掌握程度决定，
+            每天一关，五项任务做满才算过关。不限天数——进度由你的掌握程度决定，
             练到词库通关为止。
           </p>
           <p style={{ marginBottom: 12 }}>

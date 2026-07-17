@@ -202,7 +202,7 @@ export interface LearningStore {
      * "7 天后复习"变成"7 次通关后复习"，一天猛刷就会把复习全压到当天。
      */
     calendarDay: number;
-    /** 通关进度（第几关，1-60）。只有做完四项任务才 +1，请假不推进也不倒退。 */
+    /** 通关进度（第几关）。只有做完五项任务才 +1，请假不推进也不倒退。 */
     planDay: number;
     currentPhase: 1 | 2 | 3;
     phaseReady: boolean;

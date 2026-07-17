@@ -2,7 +2,7 @@
 //
 // 两个"天"的概念必须分开，不能合并：
 //   calendarDay —— 真实天数，只喂 SRS 算复习到期，永远跟着日历走
-//   planDay     —— 通关进度，做完四项任务才 +1，请假不推进也不倒退
+//   planDay     —— 通关进度，做完五项任务才 +1，请假不推进也不倒退
 // 若用通关数去算 SRS 间隔，"7 天后复习"会变成"7 次通关后复习"，
 // 一天猛刷就把整周的复习压到当天，艾宾浩斯就废了。
 //
@@ -200,7 +200,7 @@ export function isTaskDone(done: number, target: number): boolean {
   return target === 0 || done >= target;
 }
 
-/** 某关四项任务是否都做满了目标量 */
+/** 某关五项任务是否都做满了目标量 */
 export function isLevelComplete(
   completion: DailyCompletion | undefined,
   target: DailyTarget
@@ -257,7 +257,7 @@ export function refreshPlan(
 }
 
 /**
- * 给某关的一项任务记一笔完成量；四项都做满目标才通关，planDay 前进一格。
+ * 给某关的一项任务记一笔完成量；五项都做满目标才通关，planDay 前进一格。
  * 回刷已通关的旧关不会推进 planDay。
  *
  * @param amount 本次完成量，默认 1。单词模块清空队列时会一次性补满。

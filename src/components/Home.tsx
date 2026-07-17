@@ -135,7 +135,7 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
           <div className="hint" style={{ marginTop: 8 }}>
             <strong>还差 {remaining} 项通关</strong>
             <p className="muted" style={{ marginTop: 4 }}>
-              四项全做完才算过关，做不完不解锁下一关。
+              五项全做完才算过关，做不完不解锁下一关。
             </p>
           </div>
         )}
@@ -184,54 +184,6 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
         </div>
       </div>
 
-      <button
-        className="btn btn-block btn-secondary"
-        style={{ marginBottom: 12 }}
-        onClick={() => onNavigate('levels')}
-      >
-        🗺️ 关卡列表
-      </button>
-
-      {/* 功能入口 */}
-      <div className="entry-grid">
-        <button className="entry" onClick={() => onNavigate('words')}>
-          <span className="emoji">📚</span>单词学习
-        </button>
-        <button className="entry" onClick={() => onNavigate('framework')}>
-          <span className="emoji">🏗️</span>框架造句
-        </button>
-        <button className="entry" onClick={() => onNavigate('shadowing')}>
-          <span className="emoji">🎤</span>Shadowing
-        </button>
-        <button className="entry" onClick={() => onNavigate('listening')}>
-          <span className="emoji">👂</span>听辨训练
-        </button>
-        <button className="entry" onClick={() => onNavigate('dialogue')}>
-          <span className="emoji">💬</span>对话模拟
-        </button>
-      </div>
-
-      {/* 学习概览 */}
-      <div className="card">
-        <div className="row">
-          <span className="muted">累计学习单词</span>
-          <strong>
-            {learned} / {WORDS.length}
-          </strong>
-        </div>
-      </div>
-
-      <div className="entry-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-        <button className="entry" onClick={() => onNavigate('stats')}>
-          <span className="emoji">📊</span>统计
-        </button>
-        <button className="entry" onClick={() => onNavigate('browser')}>
-          <span className="emoji">📖</span>词库
-        </button>
-        <button className="entry" onClick={() => onNavigate('settings')}>
-          <span className="emoji">⚙️</span>设置
-        </button>
-      </div>
     </div>
   );
 }

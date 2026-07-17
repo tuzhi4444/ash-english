@@ -23,12 +23,14 @@ import Stats from './components/Stats';
 import Settings from './components/Settings';
 import WordBrowser from './components/WordBrowser';
 
+// 底部栏 = 页面导航（去哪个页面），练习模式一律从首页的通关面板进。
+// 早先这里放的是单词/框架/跟读，和面板里的任务重复了，故改成页面级入口。
 const NAV: { view: View; icon: string; label: string }[] = [
   { view: 'home', icon: '🏠', label: '首页' },
-  { view: 'words', icon: '📚', label: '单词' },
-  { view: 'framework', icon: '🏗️', label: '框架' },
-  { view: 'shadowing', icon: '🎤', label: '跟读' },
-  { view: 'stats', icon: '📊', label: '更多' },
+  { view: 'levels', icon: '🗺️', label: '关卡' },
+  { view: 'browser', icon: '📖', label: '词库' },
+  { view: 'stats', icon: '📊', label: '统计' },
+  { view: 'settings', icon: '⚙️', label: '设置' },
 ];
 
 export default function App(): React.JSX.Element {
@@ -86,7 +88,7 @@ export default function App(): React.JSX.Element {
 
   /**
    * 给当前关卡的某项任务记一笔完成量（每答一题调一次）。
-   * 四项都做满目标时 completeTask 会自动通关并推进 planDay。
+   * 五项都做满目标时 completeTask 会自动通关并推进 planDay。
    */
   const markTask = useCallback(
     (key: keyof DailyCompletion, amount = 1) => {
