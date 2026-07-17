@@ -81,6 +81,16 @@ export function fillTemplate(template: string, answer: string): string {
 }
 
 /**
+ * 填中文模板。形容词的释义多半带"的"（美丽的 / 奇怪的），
+ * 套进"天气很{}。"就成了"天气很美丽的。"——去掉这个多余的"的"。
+ * 只对形容词槽处理：名词/动词的释义不该动。
+ */
+export function fillTemplateZh(templateZh: string, zh: string, slotType: SlotType): string {
+  const cleaned = slotType === 'adjective' ? zh.replace(/的$/, '') : zh;
+  return templateZh.replace('{}', cleaned);
+}
+
+/**
  * 按 Leitner 盒子反向加权抽一个框架：box 越低（越常答错）越容易被抽到。
  *
  * 这里不用 9 级 SRS：SRS_GAPS 走到毕业需要 239 天，而整个计划只有 60 天，

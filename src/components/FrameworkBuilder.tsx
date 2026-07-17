@@ -7,6 +7,7 @@ import { getUnlockedFrameworks, todayStr } from '../utils/plan';
 import {
   buildFormOptions,
   fillTemplate,
+  fillTemplateZh,
   getCorrectAnswer,
   selectFramework,
   selectWordForFramework,
@@ -235,7 +236,9 @@ export default function FrameworkBuilder({
             <p style={{ marginTop: 6, fontSize: 17 }}>
               {fillTemplate(q.framework.template, q.answer)}
             </p>
-            <p className="muted">{fillTemplate(q.framework.templateZh, q.word.zh)}</p>
+            <p className="muted">
+              {fillTemplateZh(q.framework.templateZh, q.word.zh, q.framework.slotType)}
+            </p>
             {!isRight && (
               <p className="muted" style={{ marginTop: 6 }}>
                 {q.framework.grammarPoint}
