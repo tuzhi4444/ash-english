@@ -58,8 +58,34 @@ export function listUsableVoices(voices: SpeechSynthesisVoice[]): SpeechSynthesi
   return voices.filter((v) => v.lang.startsWith('en') && !isNovelty(v));
 }
 
+/**
+ * 给对话里的"对方"挑一个跟主语音不同的英语语音。
+ *
+ * 对话必须是两个声音：同一个声音一人分饰两角，听感上就不是对话，
+ * 而且"对方说的"和"参考说法"分不开——后者是你自己该说的话。
+ *
+ * 挑不出第二个（只有一个英语语音的设备）时返回 null，
+ * 调用方退回主语音——单声道对话也好过没声音。
+ */
+export function pickPartnerVoice(
+  voices: SpeechSynthesisVoice[],
+  mainVoiceName?: string | null
+): SpeechSynthesisVoice | null {
+  const usable = listUsableVoices(voices);
+  const main = selectBestVoice(voices, mainVoiceName);
+  const others = usable.filter((v) => v.name !== main?.name);
+  if (others.length === 0) return null;
+  // 优先挑 PREFERRED 里排得上号的，保证对方的声音也是正经人声
+  for (const name of PREFERRED) {
+    const found = others.find((v) => v.name.includes(name));
+    if (found) return found;
+  }
+  return others[0];
+}
+
 export interface UseTTS {
-  speak: (text: string, rate?: number) => void;
+  /** @param voiceName 指定语音名，不传则用设置里的优选语音（对话的两个角色靠它区分） */
+  speak: (text: string, rate?: number, voiceName?: string | null) => void;
   cancel: () => void;
   isSpeaking: boolean;
   voices: SpeechSynthesisVoice[];
@@ -88,13 +114,17 @@ export function useTTS(
   const selectedVoice = selectBestVoice(voices, preferredVoice);
 
   const speak = useCallback(
-    (text: string, rate?: number) => {
+    (text: string, rate?: number, voiceName?: string | null) => {
       if (!isSupported || !text) return;
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US';
       u.rate = rate ?? rateRef.current;
-      const v = selectBestVoice(window.speechSynthesis.getVoices(), preferredVoice);
+      // voiceName 优先于设置里的优选语音：对话靠它让对方换个声音说话
+      const v = selectBestVoice(
+        window.speechSynthesis.getVoices(),
+        voiceName ?? preferredVoice
+      );
       if (v) u.voice = v;
       u.onstart = () => setIsSpeaking(true);
       u.onend = () => setIsSpeaking(false);

@@ -65,6 +65,7 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
     { key: 'framework', emoji: '🏗️', name: '框架造句', view: 'framework', target: target.framework },
     { key: 'shadowing', emoji: '🎤', name: 'Shadowing', view: 'shadowing', target: target.shadowing },
     { key: 'listening', emoji: '👂', name: '听辨训练', view: 'listening', target: target.listening },
+    { key: 'dialogue', emoji: '💬', name: '对话模拟', view: 'dialogue', target: target.dialogue },
   ];
 
   const remaining = tasks.filter(
@@ -204,6 +205,9 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
         </button>
         <button className="entry" onClick={() => onNavigate('listening')}>
           <span className="emoji">👂</span>听辨训练
+        </button>
+        <button className="entry" onClick={() => onNavigate('dialogue')}>
+          <span className="emoji">💬</span>对话模拟
         </button>
       </div>
 

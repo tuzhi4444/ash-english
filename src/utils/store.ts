@@ -9,6 +9,7 @@ export function defaultStore(): LearningStore {
     shadowing: { totalAttempts: 0, bestAccuracy: 0, practicedWords: [], history: [] },
     listening: { totalAttempts: 0, correctCount: 0, history: [] },
     passage: { totalAttempts: 0, correctCount: 0, completed: [], history: [] },
+    dialogue: { totalTurns: 0, practiced: [], history: [] },
     customPassages: [],
     assessment: {
       completed: false,

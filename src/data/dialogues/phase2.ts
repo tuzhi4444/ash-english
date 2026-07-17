@@ -1,0 +1,153 @@
+// Phase 2 阻抗突围：办事型场景，句子变长，开始有条件、过去时、简单协商
+import type { Dialogue } from '../../types';
+import { d } from './builder';
+
+export const PHASE2_DIALOGUES: Dialogue[] = [
+  d(2, 'd2-doctor', '看医生', '你头疼两周了，来看家庭医生。', [
+    ['p', 'Come in, take a seat. What brings you in today?', '请进，坐。今天哪里不舒服？'],
+    ['y', "I've been having headaches for about two weeks.", '我头疼大概两周了。', '说你头疼两周左右了'],
+    ['p', 'Every day, or now and then?', '每天都疼，还是偶尔？'],
+    ['y', 'Most days, usually in the afternoon.', '大多数日子，一般下午。', '说大多数日子，通常在下午'],
+    ['p', 'Are you sleeping well?', '睡得好吗？'],
+    ['y', 'Not really. I wake up a lot at night.', '不太好，夜里老醒。', '说睡不好，夜里经常醒'],
+    ['p', 'It could be stress. Have you had any changes at work?', '可能是压力。工作上有什么变化吗？'],
+    ['y', 'Yes, I started a new job last month.', '有，上个月换了新工作。', '说有，上个月开始了新工作'],
+    ['p', "Let's check your blood pressure first.", '先量个血压吧。'],
+    ['y', 'Sure. Should I roll up my sleeve?', '好的。要卷袖子吗？', '答应，问要不要卷起袖子'],
+  ]),
+
+  d(2, 'd2-bank', '银行开户', '你刚来这个国家，需要一个本地账户。', [
+    ['p', 'Good afternoon. How can I help you today?', '下午好，有什么可以帮您？'],
+    ['y', "I'd like to open a bank account.", '我想开一个账户。', '说你想开个银行账户'],
+    ['p', 'Of course. Do you have proof of address?', '好的。有地址证明吗？'],
+    ['y', 'I have my rental contract. Would that work?', '我有租房合同，可以吗？', '说你有租房合同，问行不行'],
+    ['p', "That's fine. And an ID or passport?", '可以。身份证或护照呢？'],
+    ['y', "Here's my passport.", '这是我的护照。', '把护照递过去'],
+    ['p', 'Great. Do you want a current account or a savings account?', '好。要活期还是储蓄账户？'],
+    ['y', 'A current account, please. What are the fees?', '活期，谢谢。手续费怎么算？', '要活期账户，顺便问手续费'],
+    ['p', "It's free if you pay in at least a thousand a month.", '每月存入一千以上就免费。'],
+    ['y', 'That should be fine.', '那应该没问题。', '说那应该没问题'],
+  ]),
+
+  d(2, 'd2-sim', '办手机卡', '你走进一家电信营业厅。', [
+    ['p', 'Hi! Are you looking for a new plan?', '你好！要办新套餐吗？'],
+    ['y', 'Yes, I need a SIM card with data.', '是的，我要一张带流量的卡。', '说你要一张有流量的手机卡'],
+    ['p', 'How much data do you use?', '你一般用多少流量？'],
+    ['y', "I'm not sure. I mostly use wifi at home.", '不太确定，在家基本用 wifi。', '说不确定，你在家主要用 wifi'],
+    ['p', "Then ten gigabytes should be plenty. That's fifteen a month.", '那 10G 绰绰有余，每月十五。'],
+    ['y', 'Is there a contract?', '有合约期吗？', '问有没有合约期'],
+    ['p', "You can cancel any time, with one month's notice.", '随时可以取消，提前一个月说就行。'],
+    ['y', "Okay, I'll take it.", '好，就办这个。', '说好，就要这个'],
+    ['p', 'Can I see some ID?', '能看一下证件吗？'],
+    ['y', 'Sure, one moment.', '当然，稍等。', '答应，让他等一下'],
+  ]),
+
+  d(2, 'd2-flat', '看房', '中介带你看一套公寓。', [
+    ['p', 'So this is the living room. It gets a lot of light in the morning.', '这是客厅，早上光线很好。'],
+    ['y', "It's bigger than I expected.", '比我想的大。', '说比你预想的大'],
+    ['p', "The bedroom's through here. Kitchen's on the left.", '卧室在这边，厨房在左边。'],
+    ['y', 'Are the bills included in the rent?', '水电费包在房租里吗？', '问水电费包不包含在房租里'],
+    ['p', 'Water is, but not electricity.', '水费包，电费不包。'],
+    ['y', 'How much is electricity, roughly?', '电费大概多少？', '问电费大概多少钱'],
+    ['p', 'The last tenant paid about fifty a month.', '上一位租客每月大概五十。'],
+    ['y', "That's reasonable. When is it available?", '还算合理。什么时候能住？', '说还合理，问什么时候可以入住'],
+    ['p', 'From the first of next month.', '下个月一号起。'],
+    ['y', 'Can I think about it and call you tomorrow?', '我能考虑一下明天给你电话吗？', '问能不能考虑一下，明天答复'],
+  ]),
+
+  d(2, 'd2-gym', '健身房办卡', '你路过一家健身房，进去问问。', [
+    ['p', 'Hi! Are you here to join?', '你好！是来办卡的吗？'],
+    ['y', "I'd like to have a look around first.", '我想先看看。', '说你想先四处看看'],
+    ['p', "Sure, I'll show you. Do you train often?", '好，我带你看。你常练吗？'],
+    ['y', 'I used to, but I stopped last year.', '以前练，去年停了。', '说以前练，去年停了'],
+    ['p', 'We do a free trial week. No commitment.', '我们有免费体验周，不用承诺什么。'],
+    ['y', 'That sounds good. What does membership cost?', '听起来不错。会员费多少？', '说听着不错，问会员费多少'],
+    ['p', 'Thirty a month, or twenty-five if you pay for a year.', '每月三十，年付的话二十五。'],
+    ['y', "I'd rather pay monthly for now.", '我暂时更想按月付。', '说你现在更想按月付'],
+  ]),
+
+  d(2, 'd2-heating', '给房东报修', '暖气昨晚开始不热了，你打给房东。', [
+    ['p', 'Hello?', '喂？'],
+    ['y', "Hi, it's Ash from flat 3B. The heating isn't working.", '你好，我是 3B 的 Ash。暖气不工作了。', '自报家门，说暖气坏了'],
+    ['p', 'Since when?', '从什么时候开始？'],
+    ['y', 'Since yesterday evening.', '从昨天晚上开始。', '说从昨天晚上开始'],
+    ['p', "Have you checked the boiler? There's a reset button.", '你看过锅炉了吗？上面有个复位键。'],
+    ['y', 'I tried that. Nothing happened.', '我试过了，没反应。', '说你试过了，没有用'],
+    ['p', "Alright, I'll send someone. Are you home tomorrow morning?", '好，我派人过去。你明天上午在家吗？'],
+    ['y', 'I have to work, but I can be here after five.', '我要上班，五点以后可以。', '说你要上班，但五点以后可以'],
+  ]),
+
+  d(2, 'd2-complain', '餐厅投诉', '你点的汤端上来是凉的，服务员过来问。', [
+    ['p', 'Is everything alright with your meal?', '菜都还好吗？'],
+    ['y', 'Actually, the soup is cold.', '其实这汤是凉的。', '说汤是凉的'],
+    ['p', "Oh, I'm so sorry. Would you like me to heat it up?", '啊，非常抱歉。要我拿去热一下吗？'],
+    ['y', 'Could you bring a fresh one instead?', '能换一份新的吗？', '问能不能换一份新的'],
+    ['p', "Of course. It'll be a few minutes.", '当然，要等几分钟。'],
+    ['y', "That's fine, thank you.", '没关系，谢谢。', '说没关系，谢谢'],
+    ['p', "And it's on the house, of course.", '这份当然算我们的。'],
+    ['y', "That's very kind, but you don't have to.", '太客气了，其实不必。', '说他太客气了，不必这样'],
+  ]),
+
+  d(2, 'd2-dentist', '电话预约牙医', '你有颗牙喝凉水会疼，打电话预约。', [
+    ['p', 'Dental practice, good morning.', '牙科诊所，早上好。'],
+    ['y', "Hi, I'd like to make an appointment.", '你好，我想预约。', '说你想预约'],
+    ['p', 'Are you registered with us?', '您在我们这儿建过档吗？'],
+    ['y', 'No, this would be my first time.', '没有，这是第一次。', '说没有，这是你第一次来'],
+    ['p', 'No problem. Is it a check-up, or is something wrong?', '没关系。是例行检查还是哪里不舒服？'],
+    ['y', 'One of my teeth hurts when I drink something cold.', '我有颗牙一喝凉的就疼。', '说有一颗牙喝凉的会疼'],
+    ['p', 'We could fit you in Thursday at two, or Friday at ten.', '周四两点或周五十点可以安排。'],
+    ['y', 'Friday works better for me.', '周五对我更方便。', '说周五更合适'],
+    ['p', 'Great. Can I take your name and date of birth?', '好的。能给我您的姓名和出生日期吗？'],
+    ['y', "It's Ash, and I was born in 1990.", '我叫 Ash，1990 年出生。', '报上名字和出生年份'],
+  ]),
+
+  d(2, 'd2-airport', '机场值机', '你在值机柜台，行李可能超重。', [
+    ['p', 'Good morning. Can I see your passport and booking?', '早上好。护照和订单给我看一下？'],
+    ['y', 'Here you go.', '给你。', '把东西递过去'],
+    ['p', 'Any bags to check in?', '有要托运的行李吗？'],
+    ['y', 'Just this one.', '就这一件。', '说只有一件'],
+    ['p', 'Pop it on the scale, please. Did you pack it yourself?', '请放到秤上。是您自己装的吗？'],
+    ['y', 'Yes, I did.', '是的。', '确认是你自己装的'],
+    ['p', "It's two kilos over. That'll be forty euros.", '超重两公斤，要收四十欧。'],
+    ['y', 'Can I move something into my hand luggage?', '我能拿点东西放随身行李吗？', '问能不能挪点东西到随身行李'],
+    ['p', 'Sure, go ahead.', '可以，请便。'],
+    ['y', 'Thanks. Is that better?', '谢谢。现在行了吗？', '道谢，问现在够不够'],
+  ]),
+
+  d(2, 'd2-lunch', '同事约午饭', '同事来问你要不要一起吃午饭。', [
+    ['p', "We're going for lunch at one. Want to join?", '我们一点去吃饭，一起吗？'],
+    ['y', "I'd love to, but I've got a call at one.", '很想去，但我一点有个电话。', '说很想去，但一点有个电话会议'],
+    ['p', 'No worries. We can wait until half past.', '没事，我们可以等到一点半。'],
+    ['y', 'Really? That would be great.', '真的吗？那太好了。', '有点意外又高兴，说那太好了'],
+    ['p', "Any preference? There's a Thai place round the corner.", '想吃什么？拐角有家泰餐。'],
+    ['y', "Anything's fine with me.", '我都行。', '说你都可以'],
+    ['p', 'Thai it is, then.', '那就泰餐。'],
+    ['y', 'See you at half one.', '一点半见。', '说一点半见'],
+  ]),
+
+  d(2, 'd2-service', '网购客服', '你买的台灯到货就是碎的，打客服电话。', [
+    ['p', 'Customer service, how can I help?', '客服您好，有什么可以帮您？'],
+    ['y', 'I ordered a lamp last week and it arrived broken.', '我上周订了盏台灯，到货是碎的。', '说上周买的台灯到货就碎了'],
+    ['p', "I'm sorry about that. Do you have the order number?", '很抱歉。有订单号吗？'],
+    ['y', "Yes, it's four four two nine.", '有，4429。', '说有，把号码报出来'],
+    ['p', 'Thank you. Would you like a replacement or a refund?', '谢谢。您要换货还是退款？'],
+    ['y', 'A replacement, if you have it in stock.', '换货，如果有现货的话。', '想换货，前提是有货'],
+    ['p', "We do. I'll send one out today. Can you return the broken one?", '有货，今天就发。碎的那个能寄回吗？'],
+    ['y', 'Do I have to pay for the return?', '退货运费要我出吗？', '问退货运费是不是你出'],
+    ['p', "No, we'll email you a free label.", '不用，我们会发个免费面单给您。'],
+    ['y', 'Perfect, thanks for sorting it out.', '太好了，谢谢你帮我解决。', '说太好了，谢谢他帮忙处理'],
+  ]),
+
+  d(2, 'd2-post', '邮局寄包裹', '你要往中国寄一个包裹。', [
+    ['p', 'Next, please. What are you sending?', '下一位。您要寄什么？'],
+    ['y', "I'd like to send this to China.", '我想把这个寄到中国。', '说你要寄到中国'],
+    ['p', "What's inside?", '里面是什么？'],
+    ['y', 'Just books and some clothes.', '就是书和一些衣服。', '说是书和一些衣服'],
+    ['p', 'Standard or express? Standard takes about three weeks.', '普通还是快递？普通大约三周。'],
+    ['y', 'How much is express?', '快递多少钱？', '问快递要多少钱'],
+    ['p', 'Forty-five. Standard is eighteen.', '四十五。普通十八。'],
+    ['y', "Standard's fine. There's no rush.", '普通就行，不急。', '说普通的就行，不着急'],
+    ['p', 'Fill in this form, please.', '请填一下这张表。'],
+    ['y', 'Do I need to list everything?', '每样都要列出来吗？', '问是不是每样东西都要写'],
+  ]),
+];

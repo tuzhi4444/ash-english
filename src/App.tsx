@@ -18,6 +18,7 @@ import WordLearning from './components/WordLearning';
 import FrameworkBuilder from './components/FrameworkBuilder';
 import Shadowing from './components/Shadowing';
 import Listening from './components/Listening';
+import DialoguePractice from './components/Dialogue';
 import Stats from './components/Stats';
 import Settings from './components/Settings';
 import WordBrowser from './components/WordBrowser';
@@ -199,6 +200,14 @@ export default function App(): React.JSX.Element {
           store={store}
           onUpdate={update}
           onTaskDone={(amount) => markTask('listening', amount ?? 1)}
+          onBack={back}
+        />
+      )}
+      {view === 'dialogue' && (
+        <DialoguePractice
+          store={store}
+          onUpdate={update}
+          onTurnDone={() => markTask('dialogue')}
           onBack={back}
         />
       )}

@@ -15,27 +15,29 @@ export interface DailyTarget {
   framework: number;
   shadowing: number;
   listening: number;
+  /** 对话接话轮数 */
+  dialogue: number;
 }
 
 /**
  * 各阶段的输出类任务量（不含 words —— 单词量由当天队列决定，见 getDailyTarget）。
  *
- * 按"每天 1 小时"配平，每题耗时按 造句25s / 跟读30s / 听辨22s / 单词10s 估算：
- *   Phase 1 ≈ 46 分、Phase 2 ≈ 53 分、Phase 3 ≈ 58 分（含单词稳态的 30 分）
+ * 按"每天 1 小时"配平，每题耗时按 造句25s / 跟读30s / 听辨22s / 对话每轮23s / 单词10s 估算。
  *
- * 跟读量比初版（3/5/8）提高了一个数量级：本方法论的目标是"听懂与说出"，
- * 而 3 句跟读只有 1 分半，远达不到 shadowing 建立口腔肌肉记忆所需的剂量
- * （经典练法是连续 15-30 分钟）。现在 Phase 3 的 35 句约合 18 分钟。
+ * 对话是后加的第五项，时间从 shadowing 里匀出来——两者都是"开口说"，
+ * 而对话是回合制交际、比孤立单句跟读更接近真实场景，是更高价值的那个。
+ * 匀完每阶段输出总时长反而略降：
+ *   Phase 1 ≈ 15.6 分、Phase 2 ≈ 22.5 分、Phase 3 ≈ 26.5 分（另加单词稳态约 30 分）
  */
 export const OUTPUT_TARGETS: Record<
   '1' | '2' | '3' | 'maintenance',
   Omit<DailyTarget, 'words'>
 > = {
-  '1': { framework: 8, shadowing: 20, listening: 8 },
-  '2': { framework: 12, shadowing: 28, listening: 12 },
-  '3': { framework: 15, shadowing: 35, listening: 12 },
+  '1': { framework: 8, shadowing: 14, listening: 8, dialogue: 6 },
+  '2': { framework: 12, shadowing: 20, listening: 12, dialogue: 8 },
+  '3': { framework: 15, shadowing: 24, listening: 12, dialogue: 10 },
   // 词库发完后不再有新词，省下的时间全部让给听说
-  maintenance: { framework: 10, shadowing: 40, listening: 12 },
+  maintenance: { framework: 10, shadowing: 28, listening: 12, dialogue: 10 },
 };
 
 /**
@@ -190,7 +192,7 @@ export function getUnlockedFrameworks(phase: 1 | 2 | 3): Framework[] {
 
 /** 空的关卡完成记录 */
 export function emptyCompletion(): DailyCompletion {
-  return { words: 0, framework: 0, shadowing: 0, listening: 0 };
+  return { words: 0, framework: 0, shadowing: 0, listening: 0, dialogue: 0 };
 }
 
 /** 某一项是否达标（目标为 0 表示本阶段不需要做） */
@@ -208,7 +210,8 @@ export function isLevelComplete(
     isTaskDone(completion.words, target.words) &&
     isTaskDone(completion.framework, target.framework) &&
     isTaskDone(completion.shadowing, target.shadowing) &&
-    isTaskDone(completion.listening, target.listening)
+    isTaskDone(completion.listening, target.listening) &&
+    isTaskDone(completion.dialogue, target.dialogue)
   );
 }
 

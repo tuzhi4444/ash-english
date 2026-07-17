@@ -86,6 +86,31 @@ export interface Passage {
   source: 'builtin' | 'imported';
 }
 
+/** 对话里的一轮 */
+export interface DialogueTurn {
+  /** partner = 对方说（TTS 播）；you = 你说（张嘴接话） */
+  speaker: 'partner' | 'you';
+  en: string;
+  zh: string;
+  /**
+   * 仅 you 轮有值：提示你此刻要表达什么（中文），比 zh 更像"意图"而非"译文"。
+   * 分开是因为对话没有标准答案——提示的是"你要干什么"，
+   * 而 en/zh 只是一种参考说法，不是唯一正确答案。
+   */
+  intent?: string;
+}
+
+/** 对话场景：你扮演其中一方，听对方说、然后接话 */
+export interface Dialogue {
+  id: string;
+  phase: 1 | 2 | 3;
+  /** 场景名，如「在药店买感冒药」 */
+  title: string;
+  /** 情境交代（中文），给你开口前的上下文 */
+  scene: string;
+  turns: DialogueTurn[];
+}
+
 /** 单条单词学习记录 */
 export interface WordRecord {
   seen: boolean;
@@ -121,6 +146,8 @@ export interface DailyCompletion {
   framework: number;
   shadowing: number;
   listening: number;
+  /** 对话接话轮数（不是对话篇数）——一篇对话你要接好几次话 */
+  dialogue: number;
 }
 
 /** 学习总存储 */
@@ -145,6 +172,18 @@ export interface LearningStore {
     /** 做过的短文 id；再做同一篇不计入每日配额（答案已知，否则等于白拿） */
     completed: string[];
     history: { passageId: string; score: number; total: number; date: string }[];
+  };
+  /**
+   * 对话场景记录。
+   *
+   * 没有 completed 列表（短文有）：短文是理解题，做过就知道答案，重做等于白拿配额；
+   * 对话是输出练习，同一个场景说第二遍第三遍才是建反射的正道，重复必须计数。
+   */
+  dialogue: {
+    totalTurns: number;
+    /** 练过的对话 id，只用于展示"练过几个场景" */
+    practiced: string[];
+    history: { dialogueId: string; accuracy: number; date: string }[];
   };
   /** 用户导入的连续听力材料。放进主 store，因此会随「导出进度」一起备份 */
   customPassages: Passage[];
@@ -205,6 +244,7 @@ export type View =
   | 'framework'
   | 'shadowing'
   | 'listening'
+  | 'dialogue'
   | 'stats'
   | 'settings'
   | 'browser';

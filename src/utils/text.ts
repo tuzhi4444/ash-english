@@ -18,11 +18,11 @@ export function levenshtein(a: string, b: string): number {
   return prev[b.length];
 }
 
-/** 分词并去掉标点、转小写 */
+/** 分词并去掉标点、转小写。含弯引号——否则 that's 会带着 ’ 参与比对而永远配不上 */
 export function tokenize(s: string): string[] {
   return s
     .toLowerCase()
-    .replace(/[.,!?;:"'()]/g, '')
+    .replace(/[.,!?;:"'’‘“”()]/g, '')
     .split(/\s+/)
     .filter(Boolean);
 }

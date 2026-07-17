@@ -32,12 +32,42 @@ interface LegacyPlan {
  */
 const DONE_ENOUGH = 9999;
 function toCounts(c: LegacyCompletion): DailyCompletion {
+  // 对话是后加的任务：老关卡若四项都做完了（即已通关），
+  // 把 dialogue 也置为已达标——总不能因为新增了任务，
+  // 就让用户已经通关的旧关卡凭空退回未完成。没通关的置 0。
+  const wasCleared = Boolean(c.words && c.framework && c.shadowing && c.listening);
   return {
     words: c.words ? DONE_ENOUGH : 0,
     framework: c.framework ? DONE_ENOUGH : 0,
     shadowing: c.shadowing ? DONE_ENOUGH : 0,
     listening: c.listening ? DONE_ENOUGH : 0,
+    dialogue: wasCleared ? DONE_ENOUGH : 0,
   };
+}
+
+/**
+ * 给 v2 存档（有 planDay，但没 dialogue 字段）的关卡完成记录补上 dialogue。
+ *
+ * 不补的后果是硬 bug：completeTask 会算 `cur.dialogue + amount` = NaN，
+ * 该关的对话任务永远做不满、卡死通关。
+ * 已通关的关卡补 DONE_ENOUGH（回刷时不显示为未完成），其余补 0。
+ */
+function backfillDialogue(
+  levels: Record<number, Partial<DailyCompletion>>,
+  cleared: number[]
+): Record<number, DailyCompletion> {
+  const out: Record<number, DailyCompletion> = {};
+  for (const [k, c] of Object.entries(levels)) {
+    const level = Number(k);
+    out[level] = {
+      words: c.words ?? 0,
+      framework: c.framework ?? 0,
+      shadowing: c.shadowing ?? 0,
+      listening: c.listening ?? 0,
+      dialogue: c.dialogue ?? (cleared.includes(level) ? DONE_ENOUGH : 0),
+    };
+  }
+  return out;
 }
 
 /** 是否是尚未迁移的旧存档 */
@@ -61,6 +91,7 @@ export function migrateStore(raw: Partial<LearningStore>): LearningStore {
     ...raw,
     // 这几个是后加的字段，旧存档里没有，用默认值兜底
     passage: { ...base.passage, ...(raw.passage ?? {}) },
+    dialogue: { ...base.dialogue, ...(raw.dialogue ?? {}) },
     customPassages: raw.customPassages ?? [],
     stats: { ...base.stats, ...(raw.stats ?? {}) },
     settings: { ...base.settings, ...(raw.settings ?? {}) },
@@ -110,14 +141,19 @@ export function migrateStore(raw: Partial<LearningStore>): LearningStore {
   const p = (rawPlan ?? {}) as Partial<LearningStore['plan']>;
   const startDate = p.startDate ?? base.plan.startDate;
   const planDay = p.planDay ?? 1;
+  const cleared = p.cleared ?? [];
   merged.plan = {
     startDate,
     calendarDay: calculateCalendarDay(startDate),
     planDay,
     currentPhase: p.currentPhase ?? 1,
     phaseReady: p.phaseReady ?? false,
-    levels: p.levels ?? {},
-    cleared: p.cleared ?? [],
+    // 关卡完成记录补 dialogue 字段——不补会让 completeTask 算出 NaN、卡死通关
+    levels: backfillDialogue(
+      (p.levels ?? {}) as Record<number, Partial<DailyCompletion>>,
+      cleared
+    ),
+    cleared,
     lastClearedDate: p.lastClearedDate ?? null,
     activeLevel: p.activeLevel ?? planDay,
     mode: p.mode ?? 'training',
