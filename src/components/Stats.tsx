@@ -121,6 +121,13 @@ export default function Stats({ store, onBack }: Props): React.JSX.Element {
             </div>
           </div>
           <div className="stat-item">
+            <div className="stat-value">{store.dialogue.totalTurns}</div>
+            {/* 对话不判对错，故不报正确率；只记接话次数与练过的场景数 */}
+            <div className="stat-label">
+              对话接话（练过 {store.dialogue.practiced.length} 个场景）
+            </div>
+          </div>
+          <div className="stat-item">
             <div className="stat-value">{store.plan.cleared.length}</div>
             <div className="stat-label">已通关</div>
           </div>
