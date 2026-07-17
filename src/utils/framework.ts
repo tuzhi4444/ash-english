@@ -1,6 +1,7 @@
 // 框架造句：选词与答案校验
 import type { Framework, FrameworkRecord, SlotType, Word, WordRecord } from '../types';
 import { getIngForm, getPastForm, getPresentForm } from './inflect';
+import { EXCLUDED_FRAMEWORK_VERBS } from '../data/frameworks';
 
 /** 根据 slotType 取该词的正确形态 */
 export function getCorrectAnswer(word: Word, slotType: SlotType): string {
@@ -35,8 +36,20 @@ export function selectWordForFramework(
   let candidates = words.filter((w) => w.pos === framework.slotPos);
   if (candidates.length === 0) return null;
 
-  // 2. 语义标签过滤（无匹配则不收窄）
-  if (framework.compatibleTags.length > 0) {
+  // 1.5 动词框架：剔除被当成独立词条的变位形式（was/goes/made…）与
+  //     无法命令、无法"喜欢做"的静态动词（seem/belong/exist…）
+  if (framework.slotPos === 'v.') {
+    const usable = candidates.filter((w) => !EXCLUDED_FRAMEWORK_VERBS.has(w.en));
+    if (usable.length > 0) candidates = usable;
+  }
+
+  // 2. 选词收窄：优先用白名单（主语/语义写死的框架），否则退回标签
+  //    白名单是人工按语义域策展的，能杜绝"The weather is tough"这类废句
+  if (framework.slotWhitelist && framework.slotWhitelist.length > 0) {
+    const wl = new Set(framework.slotWhitelist);
+    const listed = candidates.filter((w) => wl.has(w.en));
+    if (listed.length > 0) candidates = listed;
+  } else if (framework.compatibleTags.length > 0) {
     const tagged = candidates.filter((w) =>
       w.tags.some((t) => framework.compatibleTags.includes(t))
     );
@@ -54,9 +67,17 @@ export function selectWordForFramework(
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-/** 把答案填进模板 */
+/**
+ * 把答案填进模板，并修正不定冠词 a→an。
+ * 模板里的冠词是写死的（"There is a {}."），填进元音开头的词就成了
+ * "a egg"，得在成句后统一纠正。词库里没有 university/hour 这类
+ * "元音字母辅音音"或"辅音字母元音音"的反例，故按首字母判断即可。
+ */
 export function fillTemplate(template: string, answer: string): string {
-  return template.replace('{}', answer);
+  const filled = template.replace('{}', answer);
+  return filled.replace(/\b([Aa]) (?=[aeiou])/g, (_m, a: string) =>
+    a === 'A' ? 'An ' : 'an '
+  );
 }
 
 /**

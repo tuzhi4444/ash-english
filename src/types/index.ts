@@ -60,6 +60,11 @@ export interface Framework {
   subject: string;
   /** 选词时的语义过滤标签 */
   compatibleTags: string[];
+  /**
+   * 选词白名单（word.en 列表）。给"主语/语义写死"的框架用——
+   * 天气只能配 nice/cold 之类，不能配 tough；有它就无视 compatibleTags。
+   */
+  slotWhitelist?: string[];
   sentenceType: SentenceType;
   /** 人称：1=第一人称，2=第二人称，3=第三人称 */
   person: 1 | 2 | 3;

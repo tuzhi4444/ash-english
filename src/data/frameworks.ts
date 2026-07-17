@@ -1,6 +1,22 @@
 // 36 个框架模板，三阶段各 12 个
 import type { Framework } from '../types';
 
+// —— 框架选词白名单（人工按语义域策展，避免"The weather is tough"这类废句）——
+// 生成脚本 scripts/curate-frameworks（见 commit 说明）；改词库后需同步复核。
+const WEATHER_ADJ = ['cold', 'hot', 'warm', 'cool', 'nice', 'fine', 'clear', 'wet', 'terrible', 'awful', 'beautiful', 'perfect', 'bad', 'good', 'great', 'calm'];
+const THING_ADJ = ['easy', 'hard', 'difficult', 'big', 'small', 'huge', 'tiny', 'new', 'old', 'good', 'bad', 'great', 'nice', 'fine', 'cold', 'hot', 'warm', 'cool', 'clean', 'dark', 'deep', 'high', 'low', 'long', 'short', 'fast', 'slow', 'cheap', 'expensive', 'dangerous', 'wet', 'full', 'clear', 'broken', 'closed', 'fixed', 'lost', 'ready', 'real', 'true', 'false', 'right', 'wrong', 'strange', 'weird', 'odd', 'obvious', 'perfect', 'thin', 'tight', 'loud', 'quiet', 'quick', 'sweet', 'ugly', 'beautiful', 'amazing', 'awesome', 'awful', 'terrible', 'brilliant', 'ridiculous', 'scary', 'boring', 'exciting', 'serious', 'special', 'fair', 'rough', 'impossible', 'red', 'blue', 'black', 'white', 'green', 'brown', 'yellow'];
+const MOVIE_ADJ = ['boring', 'exciting', 'good', 'bad', 'great', 'terrible', 'awful', 'amazing', 'awesome', 'brilliant', 'fabulous', 'terrific', 'sad', 'scary', 'long', 'short', 'popular', 'famous', 'ridiculous', 'unbelievable', 'impressive', 'beautiful', 'perfect', 'weird'];
+const FOOD_ADJ = ['delicious', 'good', 'bad', 'great', 'terrible', 'awful', 'amazing', 'fresh', 'sweet', 'hot', 'cold', 'cheap', 'expensive', 'fabulous', 'terrific', 'fine', 'perfect', 'rich', 'warm'];
+const SITUATION_ADJ = ['serious', 'difficult', 'hard', 'bad', 'dangerous', 'terrible', 'awful', 'tough', 'strange', 'scary', 'impossible', 'obvious', 'clear', 'sad', 'crazy', 'weird'];
+const GRADABLE_ADJ = ['big', 'small', 'hard', 'easy', 'deep', 'high', 'low', 'long', 'short', 'fast', 'slow', 'hot', 'cold', 'old', 'new', 'expensive', 'cheap', 'huge', 'thin', 'strong', 'serious', 'bad', 'dangerous', 'difficult'];
+const EXISTS_NOUN = ['actor', 'address', 'animal', 'apartment', 'aunt', 'avenue', 'bag', 'ball', 'band', 'bank', 'bar', 'base', 'basement', 'bathroom', 'bear', 'bedroom', 'bell', 'belt', 'bible', 'block', 'board', 'booth', 'border', 'bowl', 'box', 'boy', 'boyfriend', 'bridge', 'buck', 'button', 'cabin', 'cable', 'cake', 'camera', 'camp', 'candy', 'cap', 'casino', 'castle', 'center', 'chair', 'channel', 'chick', 'chicken', 'child', 'chip', 'church', 'circle', 'city', 'closet', 'club', 'collection', 'community', 'computer', 'copy', 'corner', 'couch', 'council', 'country', 'county', 'cousin', 'cow', 'creature', 'cup', 'customer', 'daughter', 'desert', 'desk', 'device', 'diamond', 'disaster', 'district', 'dog', 'doll', 'door', 'downtown', 'dragon', 'drama', 'dress', 'driver', 'duck', 'dude', 'duke', 'earl', 'edge', 'egg', 'elevator', 'estate', 'family', 'fella', 'field', 'file', 'fire', 'fish', 'flight', 'floor', 'fox', 'friend', 'garden', 'gate', 'gift', 'god', 'governor', 'grandfather', 'grandma', 'grandmother', 'guard', 'guide', 'hall', 'hat', 'heaven', 'hole', 'hook', 'horse', 'hospital', 'hotel', 'house', 'human', 'inspector', 'island', 'job', 'joke', 'key', 'king', 'kit', 'kitchen', 'lake', 'land', 'lane', 'law', 'liar', 'light', 'line', 'list', 'machine', 'maid', 'mall', 'mama', 'man', 'map', 'market', 'mayor', 'mess', 'mirror', 'model', 'monkey', 'motel', 'mother', 'mouse', 'museum', 'neighborhood', 'note', 'nurse', 'object', 'office', 'orange', 'outfit', 'pack', 'package', 'page', 'palace', 'park', 'pen', 'person', 'pet', 'phone', 'picture', 'pie', 'pig', 'pilot', 'pipe', 'pizza', 'place', 'plane', 'plant', 'plate', 'pocket', 'pool', 'pot', 'present', 'prize', 'program', 'purse', 'queen', 'radio', 'restaurant', 'roof', 'room', 'rose', 'salad', 'sandwich', 'school', 'screen', 'shirt', 'shoe', 'shop', 'sign', 'snake', 'song', 'spot', 'square', 'store', 'street', 'sweetie', 'swing', 'switch', 'table', 'tape', 'team', 'telephone', 'temple', 'thief', 'thing', 'tie', 'tiger', 'toilet', 'tour', 'tower', 'town', 'treasure', 'trip', 'turkey', 'tv', 'uncle', 'video', 'village', 'wall', 'wallet', 'window', 'wire', 'wolf', 'woman', 'writer', 'yard'];
+const OWNABLE_NOUN = ['bag', 'ball', 'belt', 'board', 'book', 'bottle', 'bowl', 'box', 'button', 'cable', 'cake', 'camera', 'cap', 'car', 'chair', 'chip', 'clock', 'closet', 'coat', 'computer', 'copy', 'couch', 'cup', 'desk', 'device', 'diamond', 'doll', 'dress', 'egg', 'file', 'gift', 'hat', 'hook', 'key', 'kit', 'light', 'list', 'machine', 'mirror', 'note', 'orange', 'outfit', 'pack', 'package', 'pen', 'pet', 'phone', 'picture', 'pie', 'pipe', 'pizza', 'plate', 'pot', 'present', 'purse', 'radio', 'ring', 'rose', 'salad', 'sandwich', 'screen', 'shirt', 'shoe', 'sign', 'table', 'tape', 'telephone', 'ticket', 'tie', 'tv', 'wallet', 'watch', 'wire'];
+const PLACE_NOUN = ['apartment', 'bank', 'bar', 'basement', 'bathroom', 'bedroom', 'cabin', 'casino', 'castle', 'church', 'city', 'club', 'country', 'county', 'district', 'elevator', 'garden', 'hall', 'hospital', 'hotel', 'house', 'island', 'kitchen', 'mall', 'market', 'motel', 'museum', 'neighborhood', 'office', 'palace', 'park', 'pool', 'restaurant', 'roof', 'room', 'school', 'shop', 'store', 'street', 'temple', 'village', 'yard'];
+
+// 动词框架排除：被当成独立词条的变位形式（was/goes/made…）+
+// 无法命令、无法"喜欢做"的静态动词（seem/belong/exist…）。i_bought_a 与 i_have_a 共用可拥有物品表。
+export const EXCLUDED_FRAMEWORK_VERBS = new Set(['am', 'are', 'is', 'be', 'been', 'was', 'were', 'bought', 'brought', 'came', 'caught', 'comes', 'did', 'drew', 'eating', 'enjoying', 'felt', 'fired', 'goes', 'got', 'grew', 'had', 'looking', 'losing', 'made', 'said', 'sat', 'saw', 'seen', 'sent', 'spent', 'stood', 'thought', 'threw', 'tried', 'understood', 'went', 'works', 'bleeding', 'born', 'seem', 'appear', 'belong', 'exist', 'owe', 'depend', 'deserve', 'matter', 'remain', 'dare', 'bet', 'afford', 'intend', 'happen', 'occur', 'arise', 'consist']);
+
 export const FRAMEWORKS: Framework[] = [
   // ===== Phase 1：冷启动（difficulty 1-2）=====
   {
@@ -16,6 +32,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 1,
     subject: '',
     compatibleTags: ['object', 'place', 'food'],
+    slotWhitelist: EXISTS_NOUN,
     sentenceType: 'declarative',
     person: 1,
   },
@@ -32,6 +49,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 1,
     subject: 'weather',
     compatibleTags: ['general'],
+    slotWhitelist: WEATHER_ADJ,
     sentenceType: 'declarative',
     person: 3,
   },
@@ -80,6 +98,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 1,
     subject: '',
     compatibleTags: ['object', 'food'],
+    slotWhitelist: OWNABLE_NOUN,
     sentenceType: 'declarative',
     person: 1,
   },
@@ -144,22 +163,24 @@ export const FRAMEWORKS: Framework[] = [
     phase: 1,
     subject: '',
     compatibleTags: ['general'],
+    slotWhitelist: THING_ADJ,
     sentenceType: 'declarative',
     person: 1,
   },
   {
     id: 'she_goes_to',
-    template: 'She goes to {}.',
+    template: 'She goes to the {}.',
     templateZh: '她去{}。',
     slotType: 'noun',
     slotPos: 'n.',
-    example: 'She goes to school.',
-    exampleZh: '她去学校。',
+    example: 'She goes to the park.',
+    exampleZh: '她去公园。',
     difficulty: 2,
-    grammarPoint: '第三人称单数 + go to + 地点',
+    grammarPoint: '第三人称单数 + go to the + 地点',
     phase: 1,
     subject: '',
     compatibleTags: ['place'],
+    slotWhitelist: PLACE_NOUN,
     sentenceType: 'declarative',
     person: 3,
   },
@@ -192,6 +213,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 1,
     subject: 'movie',
     compatibleTags: ['general'],
+    slotWhitelist: MOVIE_ADJ,
     sentenceType: 'declarative',
     person: 3,
   },
@@ -322,6 +344,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 2,
     subject: '',
     compatibleTags: ['object', 'food'],
+    slotWhitelist: OWNABLE_NOUN,
     sentenceType: 'declarative',
     person: 1,
   },
@@ -338,6 +361,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 2,
     subject: 'food',
     compatibleTags: ['general'],
+    slotWhitelist: FOOD_ADJ,
     sentenceType: 'declarative',
     person: 3,
   },
@@ -436,6 +460,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 3,
     subject: 'situation',
     compatibleTags: ['general'],
+    slotWhitelist: SITUATION_ADJ,
     sentenceType: 'declarative',
     person: 3,
   },
@@ -484,6 +509,7 @@ export const FRAMEWORKS: Framework[] = [
     phase: 3,
     subject: '',
     compatibleTags: ['general'],
+    slotWhitelist: GRADABLE_ADJ,
     sentenceType: 'interrogative',
     person: 2,
   },
