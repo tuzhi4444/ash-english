@@ -1,4 +1,8 @@
-// 单词学习：翻卡 / 听写 / 语境 / 听辨 四种模式
+// 单词学习：每个词依次走 翻卡 → 听写 → 语境 → 听辨 四步，四步做完才进下一个词。
+//
+// 关键约定：SRS 与「今日单词」配额每词只结算一次（在第四步完成时），
+// 四步汇总——错 ≤1 步算掌握。否则一个词一天会被 reviewWord 四次、
+// 配额一个词顶四个，间隔算法和通关都会乱。
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { LearningStore, Word } from '../types';
 import { WORDS } from '../data/words';
@@ -7,14 +11,16 @@ import { buildQueue, getRecord, reviewWord } from '../utils/srs';
 import { findFormInSentence } from '../utils/inflect';
 import { buildMeaningOptions } from '../utils/options';
 
-type Mode = 'flip' | 'dictation' | 'context' | 'listening';
-
-const MODE_LABELS: Record<Mode, string> = {
+const STEP_MODES = ['flip', 'dictation', 'context', 'listening'] as const;
+type StepMode = (typeof STEP_MODES)[number];
+const STEP_LABELS: Record<StepMode, string> = {
   flip: '翻卡',
   dictation: '听写',
   context: '语境',
   listening: '听辨',
 };
+/** 四步里错几步之内仍算「掌握」（喂给 SRS 的单次结算） */
+const MAX_MISSES_TO_PASS = 1;
 
 interface Props {
   store: LearningStore;
@@ -29,16 +35,17 @@ export default function WordLearning({
   onTaskDone,
   onBack,
 }: Props): React.JSX.Element {
-  const [mode, setMode] = useState<Mode>('flip');
   const [index, setIndex] = useState(0);
+  const [step, setStep] = useState(0); // 0-3，当前词走到第几个模式
   const [flipped, setFlipped] = useState(false);
   const [input, setInput] = useState('');
   const [result, setResult] = useState<'none' | 'right' | 'wrong'>('none');
+  const [replays, setReplays] = useState(0);
+  const [wordMisses, setWordMisses] = useState(0); // 当前词这四步里错了几步
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
-  const [knownCount, setKnownCount] = useState(0);
-  const [replays, setReplays] = useState(0);
+  const [masteredCount, setMasteredCount] = useState(0); // 四步汇总算掌握的词数
   const [finished, setFinished] = useState(false);
   const startedAt = useRef(Date.now());
 
@@ -60,10 +67,15 @@ export default function WordLearning({
   );
   const queue = built.queue;
   const current: Word | undefined = queue[index];
+  const mode: StepMode = STEP_MODES[step];
 
   const options = useMemo(
-    () => (current && mode === 'listening' ? buildMeaningOptions(current) : []),
-    [current, mode]
+    () => (current ? buildMeaningOptions(current) : []),
+    [current]
+  );
+  const blank = useMemo(
+    () => (current ? findFormInSentence(current.en, current.example) : null),
+    [current]
   );
 
   // 顺延的复习词写回 store
@@ -76,13 +88,13 @@ export default function WordLearning({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 听写/听辨模式进入新题时自动播报
+  // 进入听写/听辨步骤时自动播报
   useEffect(() => {
     if (!current || result !== 'none') return;
     if (mode === 'dictation') speak(current.en);
     if (mode === 'listening') speak(current.example);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current, mode]);
+  }, [current, step]);
 
   if (queue.length === 0) {
     return (
@@ -119,12 +131,12 @@ export default function WordLearning({
               <div className="stat-label">最高连击</div>
             </div>
             <div className="stat-item">
-              <div className="stat-value">{knownCount}</div>
-              <div className="stat-label">答对</div>
+              <div className="stat-value">{masteredCount}</div>
+              <div className="stat-label">掌握</div>
             </div>
             <div className="stat-item">
-              <div className="stat-value">{queue.length - knownCount}</div>
-              <div className="stat-label">答错</div>
+              <div className="stat-value">{queue.length - masteredCount}</div>
+              <div className="stat-label">待巩固</div>
             </div>
           </div>
           <div className="muted" style={{ marginTop: 12 }}>
@@ -138,52 +150,63 @@ export default function WordLearning({
     );
   }
 
-  /** 记录答题结果并推进队列 */
-  function submit(correct: boolean): void {
+  /** 记录当前这一步的对错（只做计分与反馈，不碰 SRS / 配额） */
+  function recordStep(correct: boolean): void {
+    if (correct) {
+      setScore((s) => s + 10 + combo * 2);
+      setCombo((c) => {
+        const nextCombo = c + 1;
+        setBestCombo((b) => Math.max(b, nextCombo));
+        return nextCombo;
+      });
+    } else {
+      setCombo(0);
+      setWordMisses((m) => m + 1);
+    }
+    setResult(correct ? 'right' : 'wrong');
+    if (current) speak(current.example);
+  }
+
+  /** 点「下一步 / 下一个词」：前三步只推进步骤；第四步完成时给这个词做唯一一次结算 */
+  function advance(): void {
     if (!current) return;
+    if (step < STEP_MODES.length - 1) {
+      setStep(step + 1);
+      setResult('none');
+      setFlipped(false);
+      setInput('');
+      setReplays(0);
+      return;
+    }
+
+    // 四步走完：汇总成一次对错，喂 SRS + 记一笔配额
+    const passed = wordMisses <= MAX_MISSES_TO_PASS;
     const key = current.en.toLowerCase();
     onUpdate((prev) => ({
       ...prev,
       words: {
         ...prev.words,
-        [key]: reviewWord(getRecord(prev.words, key), correct, prev.plan.calendarDay),
+        [key]: reviewWord(getRecord(prev.words, key), passed, prev.plan.calendarDay),
       },
     }));
+    if (passed) setMasteredCount((k) => k + 1);
+    onTaskDone(); // 每个词只上报一次，配额 = 词数
 
-    if (correct) {
-      setScore((s) => s + 10 + combo * 2);
-      setCombo((c) => {
-        const next = c + 1;
-        setBestCombo((b) => Math.max(b, next));
-        return next;
-      });
-      setKnownCount((k) => k + 1);
-    } else {
-      setCombo(0);
-    }
-    setResult(correct ? 'right' : 'wrong');
-    // 每答一个词记一笔，达到今日目标才算这项通关（原来整队做完只报一次，
-    // 等于答 1 个词就打勾）
-    onTaskDone();
-    speak(current.example);
-  }
-
-  function next(): void {
+    // 进入下一个词
+    setStep(0);
+    setWordMisses(0);
     setResult('none');
     setFlipped(false);
     setInput('');
     setReplays(0);
-    if (index + 1 >= queue.length) {
-      setFinished(true);
-    } else {
-      setIndex(index + 1);
-    }
+    if (index + 1 >= queue.length) setFinished(true);
+    else setIndex(index + 1);
   }
 
-  const blank = findFormInSentence(current.en, current.example);
   const contextSentence = blank
     ? current.example.replace(blank.form, '________')
     : current.example;
+  const isLastStep = step === STEP_MODES.length - 1;
 
   return (
     <div className="app">
@@ -197,28 +220,21 @@ export default function WordLearning({
         </span>
       </div>
 
-      {index === 0 && result === 'none' && (
+      {index === 0 && step === 0 && result === 'none' && (
         <div className="hint" style={{ marginBottom: 12 }}>
-          你回来啦！今天有 {built.reviewCount} 个复习 + {built.newCount} 个新词，慢慢来。
+          你回来啦！今天有 {built.reviewCount} 个复习 + {built.newCount} 个新词。
+          每个词依次走翻卡 → 听写 → 语境 → 听辨，四步做完才进下一个。
           {built.deferredCount > 0 && ` 另有 ${built.deferredCount} 个已顺延到明天。`}
         </div>
       )}
 
+      {/* 四步进度链：当前步高亮，已过的步打勾 */}
       <div className="tabs">
-        {(Object.keys(MODE_LABELS) as Mode[]).map((m) => (
-          <button
-            key={m}
-            className={`tab ${mode === m ? 'active' : ''}`}
-            onClick={() => {
-              setMode(m);
-              setResult('none');
-              setFlipped(false);
-              setInput('');
-              setReplays(0);
-            }}
-          >
-            {MODE_LABELS[m]}
-          </button>
+        {STEP_MODES.map((m, i) => (
+          <div key={m} className={`tab ${i === step ? 'active' : ''}`} style={{ cursor: 'default' }}>
+            {i < step ? '✓ ' : ''}
+            {STEP_LABELS[m]}
+          </div>
         ))}
       </div>
 
@@ -234,7 +250,7 @@ export default function WordLearning({
         <span className="muted">连击 {combo}</span>
       </div>
 
-      {/* ---- 翻卡模式 ---- */}
+      {/* ---- 翻卡 ---- */}
       {mode === 'flip' && (
         <>
           <div
@@ -254,10 +270,10 @@ export default function WordLearning({
           </div>
           {flipped && result === 'none' && (
             <div className="btn-row">
-              <button className="btn btn-secondary" onClick={() => submit(false)}>
+              <button className="btn btn-secondary" onClick={() => recordStep(false)}>
                 不认识
               </button>
-              <button className="btn btn-success" onClick={() => submit(true)}>
+              <button className="btn btn-success" onClick={() => recordStep(true)}>
                 认识
               </button>
             </div>
@@ -265,7 +281,7 @@ export default function WordLearning({
         </>
       )}
 
-      {/* ---- 听写模式 ---- */}
+      {/* ---- 听写 ---- */}
       {mode === 'dictation' && (
         <div className="card">
           <p className="muted" style={{ marginBottom: 8 }}>
@@ -282,11 +298,12 @@ export default function WordLearning({
             className="input"
             value={input}
             placeholder="输入英文单词"
+            autoCapitalize="none"
             disabled={result !== 'none'}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && result === 'none') {
-                submit(input.trim().toLowerCase() === current.en.toLowerCase());
+                recordStep(input.trim().toLowerCase() === current.en.toLowerCase());
               }
             }}
           />
@@ -294,7 +311,7 @@ export default function WordLearning({
             <button
               className="btn btn-block"
               style={{ marginTop: 12 }}
-              onClick={() => submit(input.trim().toLowerCase() === current.en.toLowerCase())}
+              onClick={() => recordStep(input.trim().toLowerCase() === current.en.toLowerCase())}
             >
               校验
             </button>
@@ -302,40 +319,50 @@ export default function WordLearning({
         </div>
       )}
 
-      {/* ---- 语境模式 ---- */}
+      {/* ---- 语境 ---- */}
       {mode === 'context' && (
         <div className="card">
           <p style={{ fontSize: 18, marginBottom: 8 }}>{contextSentence}</p>
           <p className="muted" style={{ marginBottom: 12 }}>
             {current.exampleZh}　提示：{current.zh}
           </p>
-          <input
-            className="input"
-            value={input}
-            placeholder="填入正确词形"
-            disabled={result !== 'none'}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && result === 'none' && blank) {
-                submit(input.trim().toLowerCase() === blank.form.toLowerCase());
-              }
-            }}
-          />
-          {result === 'none' && (
-            <button
-              className="btn btn-block"
-              style={{ marginTop: 12 }}
-              onClick={() =>
-                submit(!!blank && input.trim().toLowerCase() === blank.form.toLowerCase())
-              }
-            >
-              校验
-            </button>
+          {blank ? (
+            <>
+              <input
+                className="input"
+                value={input}
+                placeholder="填入正确词形"
+                autoCapitalize="none"
+                disabled={result !== 'none'}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && result === 'none') {
+                    recordStep(input.trim().toLowerCase() === blank.form.toLowerCase());
+                  }
+                }}
+              />
+              {result === 'none' && (
+                <button
+                  className="btn btn-block"
+                  style={{ marginTop: 12 }}
+                  onClick={() => recordStep(input.trim().toLowerCase() === blank.form.toLowerCase())}
+                >
+                  校验
+                </button>
+              )}
+            </>
+          ) : (
+            // 例句里找不到该词的形态（个别不规则变形）——跳过填空，不计错
+            result === 'none' && (
+              <button className="btn btn-block" onClick={() => recordStep(true)}>
+                继续
+              </button>
+            )
           )}
         </div>
       )}
 
-      {/* ---- 听辨模式 ---- */}
+      {/* ---- 听辨 ---- */}
       {mode === 'listening' && (
         <div className="card">
           <p className="muted" style={{ marginBottom: 8 }}>
@@ -356,14 +383,10 @@ export default function WordLearning({
             <button
               key={oi}
               className={`option ${
-                result === 'none'
-                  ? ''
-                  : opt === current.exampleZh
-                    ? 'correct'
-                    : 'wrong'
+                result === 'none' ? '' : opt === current.exampleZh ? 'correct' : 'wrong'
               }`}
               disabled={result !== 'none'}
-              onClick={() => submit(opt === current.exampleZh)}
+              onClick={() => recordStep(opt === current.exampleZh)}
             >
               {opt}
             </button>
@@ -371,7 +394,7 @@ export default function WordLearning({
         </div>
       )}
 
-      {/* ---- 反馈 ---- */}
+      {/* ---- 反馈 + 推进 ---- */}
       {result !== 'none' && (
         <>
           <div className={`feedback ${result === 'right' ? 'correct' : 'wrong'}`}>
@@ -385,8 +408,8 @@ export default function WordLearning({
             <button className="btn btn-secondary" onClick={() => speak(current.example)}>
               🔊 重听
             </button>
-            <button className="btn" onClick={next}>
-              下一个
+            <button className="btn" onClick={advance}>
+              {isLastStep ? '下一个词' : '下一步'}
             </button>
           </div>
         </>
