@@ -269,6 +269,9 @@ body {
 .tab {
   flex: 1;
   height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
   border-radius: 8px;
