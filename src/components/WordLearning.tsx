@@ -10,6 +10,7 @@ import { useTTS } from '../hooks/useTTS';
 import { buildQueue, getRecord, reviewWord } from '../utils/srs';
 import { findFormInSentence } from '../utils/inflect';
 import { buildMeaningOptions } from '../utils/options';
+import { getUsageNote } from '../data/usageNotes';
 
 const STEP_MODES = ['flip', 'dictation', 'context', 'listening'] as const;
 type StepMode = (typeof STEP_MODES)[number];
@@ -42,6 +43,7 @@ export default function WordLearning({
   const [result, setResult] = useState<'none' | 'right' | 'wrong'>('none');
   const [replays, setReplays] = useState(0);
   const [wordMisses, setWordMisses] = useState(0); // 当前词这四步里错了几步
+  const [noteOpen, setNoteOpen] = useState(false); // 翻卡后「用法详解」是否展开
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
@@ -174,6 +176,7 @@ export default function WordLearning({
       setStep(step + 1);
       setResult('none');
       setFlipped(false);
+      setNoteOpen(false);
       setInput('');
       setReplays(0);
       return;
@@ -207,6 +210,7 @@ export default function WordLearning({
     ? current.example.replace(blank.form, '________')
     : current.example;
   const isLastStep = step === STEP_MODES.length - 1;
+  const note = getUsageNote(current.en);
 
   return (
     <div className="app">
@@ -268,6 +272,36 @@ export default function WordLearning({
               <div className="muted">点击卡片翻牌</div>
             )}
           </div>
+
+          {/* 翻卡后：多义词用法详解（有才显示，默认收起，可反复展开看） */}
+          {flipped && note && (
+            <div className="card" style={{ marginTop: 0 }}>
+              <button
+                className="btn btn-block btn-ghost"
+                style={{ textAlign: 'left' }}
+                onClick={() => setNoteOpen((o) => !o)}
+              >
+                📖 用法详解（{note.senses.length} 种用法）{noteOpen ? ' ▲' : ' ▼'}
+              </button>
+              {noteOpen && (
+                <div style={{ marginTop: 10 }}>
+                  <p className="muted" style={{ marginBottom: 10 }}>
+                    核心：{note.core}
+                  </p>
+                  {note.senses.map((s, si) => (
+                    <div key={si} className="usage-sense">
+                      <span className="tag grey">{s.use}</span>
+                      <p style={{ margin: '4px 0 0' }}>{s.en}</p>
+                      <p className="muted" style={{ margin: 0 }}>
+                        {s.zh}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {flipped && result === 'none' && (
             <div className="btn-row">
               <button className="btn btn-secondary" onClick={() => recordStep(false)}>

@@ -799,3 +799,12 @@ body {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+/* 多义词用法详解的每个义项 */
+.usage-sense {
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+.usage-sense:first-child {
+  border-top: none;
+}
