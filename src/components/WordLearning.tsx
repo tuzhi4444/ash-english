@@ -224,14 +224,6 @@ export default function WordLearning({
         </span>
       </div>
 
-      {index === 0 && step === 0 && result === 'none' && (
-        <div className="hint" style={{ marginBottom: 12 }}>
-          你回来啦！今天有 {built.reviewCount} 个复习 + {built.newCount} 个新词。
-          每个词依次走翻卡 → 听写 → 语境 → 听辨，四步做完才进下一个。
-          {built.deferredCount > 0 && ` 另有 ${built.deferredCount} 个已顺延到明天。`}
-        </div>
-      )}
-
       {/* 四步进度链：当前步高亮，已过的步打勾 */}
       <div className="tabs">
         {STEP_MODES.map((m, i) => (
