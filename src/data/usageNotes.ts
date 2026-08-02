@@ -564,6 +564,201 @@ export const USAGE_NOTES: Record<string, UsageNote> = {
       { use: '磨损（wear out）', en: 'My shoes wore out.', zh: '我的鞋磨坏了。' },
     ],
   },
+
+  // ===== 助词性副词 / 多义副词 · 形容词 · 名词 批 =====
+  up: {
+    core: '向上，引申"起来、完全用尽、发生"',
+    senses: [
+      { use: '向上 / 起来', en: 'stand up', zh: '站起来' },
+      { use: '完全（做完 / 用光）', en: 'Eat it up.', zh: '把它吃光。' },
+      { use: '发生（口语 what’s up）', en: "What's up?", zh: '怎么了？' },
+    ],
+  },
+  down: {
+    core: '向下，引申"记下、坏了"',
+    senses: [
+      { use: '向下 / 坐下', en: 'sit down', zh: '坐下' },
+      { use: '记下（write down）', en: 'Write it down.', zh: '把它记下来。' },
+      { use: '出故障（be down）', en: 'The system is down.', zh: '系统崩了。' },
+    ],
+  },
+  out: {
+    core: '向外，引申"用完、出现、大声"',
+    senses: [
+      { use: '向外 / 出去', en: 'go out', zh: '出去' },
+      { use: '用完 / 熄灭（run out）', en: 'We ran out of milk.', zh: '我们牛奶用完了。' },
+      { use: '出现 / 问世（come out）', en: 'The book came out.', zh: '这书出版了。' },
+    ],
+  },
+  off: {
+    core: '离开、分离，引申"关掉、休假、取消"',
+    senses: [
+      { use: '脱下 / 起飞（take off）', en: 'Take off your coat.', zh: '脱掉外套。' },
+      { use: '关掉（turn off）', en: 'turn off the light', zh: '关灯' },
+      { use: '休假（a day off）', en: 'I have a day off.', zh: '我休一天假。' },
+      { use: '取消（call off）', en: 'They called it off.', zh: '他们取消了。' },
+    ],
+  },
+  back: {
+    core: '向后、回原处',
+    senses: [
+      { use: '回来 / 回去（come back）', en: 'Come back soon.', zh: '早点回来。' },
+      { use: '归还（give back）', en: 'Give it back to me.', zh: '把它还给我。' },
+      { use: '支持（back sb）', en: "I'll back you.", zh: '我支持你。' },
+    ],
+  },
+  away: {
+    core: '离开、在远处',
+    senses: [
+      { use: '走开 / 离开', en: 'Go away.', zh: '走开。' },
+      { use: '拿走（take away）', en: 'Take it away.', zh: '把它拿走。' },
+      { use: '（距离）之远', en: 'The station is two miles away.', zh: '车站在两英里外。' },
+    ],
+  },
+  still: {
+    core: '仍然；也作"静止的、更"',
+    senses: [
+      { use: '仍然', en: "I'm still here.", zh: '我还在。' },
+      { use: '静止不动（形容词）', en: 'Sit still.', zh: '坐着别动。' },
+      { use: '更（+比较级）', en: 'still better', zh: '更好' },
+    ],
+  },
+  just: {
+    core: '刚好、仅仅',
+    senses: [
+      { use: '刚刚', en: 'I just arrived.', zh: '我刚到。' },
+      { use: '只是 / 仅仅', en: 'just a little', zh: '就一点点' },
+      { use: '正好 / 就', en: "That's just right.", zh: '正好合适。' },
+    ],
+  },
+  even: {
+    core: '甚至；也作"平的 / 偶数、势均力敌"',
+    senses: [
+      { use: '甚至', en: "He didn't even call.", zh: '他甚至没打电话。' },
+      { use: '平的 / 偶数（形容词）', en: 'an even number', zh: '偶数' },
+      { use: '势均力敌', en: 'The score is even.', zh: '比分打平。' },
+    ],
+  },
+  well: {
+    core: '好地（副词），也作"健康的、那么、井"',
+    senses: [
+      { use: '好地（副词）', en: 'She sings well.', zh: '她唱得好。' },
+      { use: '健康的（形容词）', en: 'I feel well.', zh: '我感觉挺好。' },
+      { use: '嗯 / 那么（语气词）', en: 'Well, let me think.', zh: '嗯，让我想想。' },
+    ],
+  },
+  pretty: {
+    core: '漂亮的；（口语）相当',
+    senses: [
+      { use: '漂亮的', en: 'a pretty dress', zh: '一条漂亮裙子' },
+      { use: '相当（副词）', en: 'pretty good', zh: '相当不错' },
+    ],
+  },
+  like: {
+    core: '像；喜欢',
+    senses: [
+      { use: '像 / 如同（介词）', en: 'It looks like rain.', zh: '看起来要下雨。' },
+      { use: '喜欢（动词）', en: 'I like tea.', zh: '我喜欢茶。' },
+      { use: '比如', en: 'fruit like apples', zh: '像苹果这样的水果' },
+    ],
+  },
+  right: {
+    core: '对的、右边、正好、权利',
+    senses: [
+      { use: '对的 / 正确', en: "You're right.", zh: '你说得对。' },
+      { use: '右边', en: 'turn right', zh: '右转' },
+      { use: '正好 / 就（副词）', en: 'right now', zh: '就现在' },
+      { use: '权利（名词）', en: 'human rights', zh: '人权' },
+    ],
+  },
+  hard: {
+    core: '硬的、难的、努力地',
+    senses: [
+      { use: '难的', en: 'a hard question', zh: '一道难题' },
+      { use: '硬的', en: 'a hard bed', zh: '一张硬床' },
+      { use: '努力地 / 使劲（副词）', en: 'work hard', zh: '努力工作' },
+    ],
+  },
+  fine: {
+    core: '好的、细的；也作"罚款"',
+    senses: [
+      { use: '好的 / 没事', en: "I'm fine, thanks.", zh: '我很好，谢谢。' },
+      { use: '细的 / 精细', en: 'fine sand', zh: '细沙' },
+      { use: '罚款（名词 / 动词）', en: 'pay a fine', zh: '交罚款' },
+    ],
+  },
+  kind: {
+    core: '善良的（形容词）；种类（名词）',
+    senses: [
+      { use: '善良的', en: 'a kind person', zh: '一个善良的人' },
+      { use: '种类（名词）', en: 'What kind of music?', zh: '哪种音乐？' },
+    ],
+  },
+  fair: {
+    core: '公平的；也作"相当地、集市"',
+    senses: [
+      { use: '公平的', en: "That's not fair.", zh: '这不公平。' },
+      { use: '还算 / 相当（fair enough）', en: 'Fair enough.', zh: '有道理。' },
+      { use: '集市 / 展会（名词）', en: 'a book fair', zh: '书展' },
+    ],
+  },
+  way: {
+    core: '路、方法、方向、程度',
+    senses: [
+      { use: '路 / 方向', en: 'the way home', zh: '回家的路' },
+      { use: '方法', en: 'a good way to learn', zh: '一个学习的好方法' },
+      { use: '程度（way too）', en: 'way too expensive', zh: '贵得太离谱' },
+    ],
+  },
+  thing: {
+    core: '东西、事情；（things）情况',
+    senses: [
+      { use: '东西', en: "What's this thing?", zh: '这东西是什么？' },
+      { use: '事情', en: 'A strange thing happened.', zh: '发生了件怪事。' },
+      { use: '情况（things）', en: 'Things are getting better.', zh: '情况在好转。' },
+    ],
+  },
+  place: {
+    core: '地方；名次；放置',
+    senses: [
+      { use: '地方', en: 'a nice place to eat', zh: '一个吃饭的好地方' },
+      { use: '名次', en: 'She came in first place.', zh: '她得了第一名。' },
+      { use: '放置（动词）', en: 'Place it on the shelf.', zh: '把它放到架子上。' },
+    ],
+  },
+  sense: {
+    core: '感觉、理智、意义',
+    senses: [
+      { use: '感觉 / 感官', en: 'a sense of humor', zh: '幽默感' },
+      { use: '讲得通（make sense）', en: 'That makes sense.', zh: '这说得通。' },
+      { use: '常识 / 判断力', en: 'common sense', zh: '常识' },
+    ],
+  },
+  matter: {
+    core: '事情、要紧、物质',
+    senses: [
+      { use: '事情（what’s the matter）', en: "What's the matter?", zh: '怎么了？' },
+      { use: '要紧（动词）', en: "It doesn't matter.", zh: '没关系。' },
+      { use: '物质（名词）', en: 'solid matter', zh: '固态物质' },
+    ],
+  },
+  order: {
+    core: '命令、订购、顺序、整齐',
+    senses: [
+      { use: '命令', en: 'give an order', zh: '下命令' },
+      { use: '点餐 / 订购', en: 'order a coffee', zh: '点一杯咖啡' },
+      { use: '顺序', en: 'in the right order', zh: '按正确顺序' },
+      { use: '故障（out of order）', en: 'The lift is out of order.', zh: '电梯坏了。' },
+    ],
+  },
+  deal: {
+    core: '交易、大量、处理',
+    senses: [
+      { use: '交易 / 协议', en: "It's a deal.", zh: '成交。' },
+      { use: '大量（a great deal）', en: 'a great deal of time', zh: '大量时间' },
+      { use: '处理（deal with）', en: 'deal with a problem', zh: '处理问题' },
+    ],
+  },
 };
 
 /** 取某词的用法详解，没有则 null */
