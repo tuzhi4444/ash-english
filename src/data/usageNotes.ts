@@ -128,7 +128,7 @@ export const USAGE_NOTES: Record<string, UsageNote> = {
     senses: [
       { use: '从……（地点 / 时间）', en: 'from nine to five', zh: '从九点到五点' },
       { use: '来自 / 出自', en: 'a letter from Tom', zh: '汤姆寄来的信' },
-      { use: '由……制成 / 区分', en: 'tell right from wrong', zh: '分辨对错' },
+      { use: '分辨 / 区分（tell A from B）', en: 'tell right from wrong', zh: '分辨对错' },
     ],
   },
   with: {
@@ -294,7 +294,7 @@ export const USAGE_NOTES: Record<string, UsageNote> = {
     ],
   },
   give: {
-    core: '给，引申"发出、让步"',
+    core: '给，引申"发出、放弃"',
     senses: [
       { use: '给', en: 'Give me the book.', zh: '把书给我。' },
       { use: '发出（动作 / 表情）', en: 'give a speech', zh: '做演讲' },
@@ -476,7 +476,7 @@ export const USAGE_NOTES: Record<string, UsageNote> = {
     ],
   },
   pick: {
-    core: '挑选、摘、捡（pick up）',
+    core: '挑选、捡起、接（人）',
     senses: [
       { use: '挑选', en: 'Pick any card.', zh: '任选一张牌。' },
       { use: '捡起（pick up）', en: 'pick up the pen', zh: '捡起那支笔' },
@@ -695,10 +695,10 @@ export const USAGE_NOTES: Record<string, UsageNote> = {
     ],
   },
   fair: {
-    core: '公平的；也作"相当地、集市"',
+    core: '公平的；也作"集市"，习语 fair enough = 有道理',
     senses: [
       { use: '公平的', en: "That's not fair.", zh: '这不公平。' },
-      { use: '还算 / 相当（fair enough）', en: 'Fair enough.', zh: '有道理。' },
+      { use: '有道理 / 可以接受（fair enough）', en: 'Fair enough.', zh: '有道理，就这样吧。' },
       { use: '集市 / 展会（名词）', en: 'a book fair', zh: '书展' },
     ],
   },
