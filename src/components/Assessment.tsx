@@ -100,8 +100,8 @@ export default function Assessment({ onFinish }: Props): React.JSX.Element {
             欢迎！这套训练用「听音 → 建反射 → 框架输出」代替背单词扣语法。
           </p>
           <p style={{ marginBottom: 12 }}>
-            每天一关，五项任务做满才算过关。不限天数——进度由你的掌握程度决定，
-            练到词库通关为止。
+            每天一组，五项任务做满才算完成。不限期限——进度由你的掌握程度决定，
+            练到词库学完为止。
           </p>
           <p style={{ marginBottom: 12 }}>
             先花 2 分钟做个小测试：我们会抽 {SAMPLE_SIZE} 个词让你判断认不认识。
@@ -143,7 +143,7 @@ export default function Assessment({ onFinish }: Props): React.JSX.Element {
         )}
         {ratio < 0.3 && (
           <div className="hint">
-            基础词还有空间，别急——Phase 1 就是为你设计的，每天 20 个词稳步来。
+            基础词还有空间，别急——Phase 1 就是为你设计的，每天十来个词稳步来。
           </div>
         )}
         <button

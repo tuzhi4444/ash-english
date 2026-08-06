@@ -129,11 +129,11 @@ export default function Stats({ store, onBack }: Props): React.JSX.Element {
           </div>
           <div className="stat-item">
             <div className="stat-value">{store.plan.cleared.length}</div>
-            <div className="stat-label">已通关</div>
+            <div className="stat-label">已完成天数</div>
           </div>
           <div className="stat-item">
             <div className="stat-value">{totalPlayedLevels(store)}</div>
-            <div className="stat-label">练过的关卡数</div>
+            <div className="stat-label">练过的天数</div>
           </div>
         </div>
       </div>

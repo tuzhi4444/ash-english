@@ -79,7 +79,7 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
       <div className="header">
         <div>
           <div className="title">Ash英语</div>
-          <div className="subtitle">听说一体 · 每天一关</div>
+          <div className="subtitle">听说一体 · 每天一组</div>
         </div>
       </div>
 
@@ -89,9 +89,9 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
           <strong>
             {plan.mode === 'maintenance'
               ? '维持模式 · 保持练习'
-              : `第 ${level} 关 · ${PHASE_NAMES[phase]}`}
+              : `第 ${level} 天 · ${PHASE_NAMES[phase]}`}
           </strong>
-          <span className="tag orange">🏆 已通关 {cleared}</span>
+          <span className="tag orange">🏆 已完成 {cleared} 天</span>
         </div>
 
         <div className="progress">
@@ -99,7 +99,7 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
         </div>
         <div className="muted" style={{ marginTop: 4 }}>
           词库进度 {learned}/{WORDS.length}
-          {isReplay && ' · 正在回刷旧关'}
+          {isReplay && ' · 正在重练前面的内容'}
         </div>
 
         <div className="muted" style={{ marginTop: 8 }}>
@@ -110,32 +110,32 @@ export default function Home({ store, onNavigate }: Props): React.JSX.Element {
         {/* 卡关状态 */}
         {isReplay ? (
           <div className="hint" style={{ marginTop: 8 }}>
-            回刷第 {level} 关巩固中，练多少都不影响进度。
+            重练第 {level} 天的内容，练多少都不影响进度。
             <button
               className="btn btn-secondary btn-block"
               style={{ marginTop: 8 }}
               onClick={() => onNavigate('levels')}
             >
-              回到第 {plan.planDay} 关
+              回到第 {plan.planDay} 天
             </button>
           </div>
         ) : clearedToday && levelDone ? (
           <div className="feedback correct" style={{ marginTop: 8 }}>
-            <strong>🎉 今天通关了</strong>
+            <strong>🎉 今天练完了</strong>
             <p className="muted" style={{ marginTop: 4 }}>
-              第 {plan.planDay} 关明天解锁。想再练可以回刷已通关的关卡，
+              第 {plan.planDay} 天明天解锁。想再练可以重做前面的日子，
               {dueCount > 0 ? `或把 ${dueCount} 个到期复习词清掉。` : '不占新词额度。'}
             </p>
           </div>
         ) : !canPlay ? (
           <div className="hint" style={{ marginTop: 8 }}>
-            今天已经通过一关了，新关明天开。一天一关是为了让复习间隔跟得上。
+            今天已经练完了，新的明天开。一天一组是为了让复习间隔跟得上。
           </div>
         ) : (
           <div className="hint" style={{ marginTop: 8 }}>
-            <strong>还差 {remaining} 项通关</strong>
+            <strong>还差 {remaining} 项完成</strong>
             <p className="muted" style={{ marginTop: 4 }}>
-              五项全做完才算过关，做不完不解锁下一关。
+              五项全做完才算完成，做不完不解锁下一天。
             </p>
           </div>
         )}

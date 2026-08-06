@@ -43,7 +43,7 @@ const TASK_ORDER: { key: keyof DailyCompletion; view: View; name: string }[] = [
 // 早先这里放的是单词/框架/跟读，和面板里的任务重复了，故改成页面级入口。
 const NAV: { view: View; icon: string; label: string }[] = [
   { view: 'home', icon: '🏠', label: '首页' },
-  { view: 'levels', icon: '🗺️', label: '关卡' },
+  { view: 'levels', icon: '🗺️', label: '进度' },
   { view: 'browser', icon: '📖', label: '词库' },
   { view: 'stats', icon: '📊', label: '统计' },
   { view: 'settings', icon: '⚙️', label: '设置' },

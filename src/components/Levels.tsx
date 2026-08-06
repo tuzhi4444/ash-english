@@ -29,8 +29,8 @@ export default function Levels({ store, onSelect, onBack }: Props): React.JSX.El
         <button className="back-btn" onClick={onBack}>
           ‹
         </button>
-        <div className="title">🗺️ 关卡列表</div>
-        <span className="muted">已通关 {plan.cleared.length}</span>
+        <div className="title">🗺️ 学习进度</div>
+        <span className="muted">已完成 {plan.cleared.length} 天</span>
       </div>
 
       <div className="card">
@@ -40,14 +40,14 @@ export default function Levels({ store, onSelect, onBack }: Props): React.JSX.El
               ? '维持模式 · 保持练习'
               : `Phase ${plan.currentPhase} · ${PHASE_NAMES[plan.currentPhase]}`}
           </strong>
-          <span className="tag">第 {plan.planDay} 关</span>
+          <span className="tag">第 {plan.planDay} 天</span>
         </div>
         <div className="muted">
-          这套计划不设总关数，练到词库通关为止；阶段由能力推进，不看天数。
-          已通关的关卡可随时回刷巩固，<strong>不占新词额度、也不影响进度</strong>。
+          这套计划不设总天数，练到词库学完为止；阶段由能力推进，不按日历。
+          已完成的日子可随时重练巩固，<strong>不占新词额度、也不影响进度</strong>。
           {clearedToday
-            ? ` 今天的新关已通过，第 ${plan.planDay} 关明天开。`
-            : ` 当前可闯第 ${plan.planDay} 关。`}
+            ? ` 今天的已经练完，第 ${plan.planDay} 天明天开。`
+            : ` 当前可练第 ${plan.planDay} 天。`}
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export default function Levels({ store, onSelect, onBack }: Props): React.JSX.El
           <div className="card" key={from}>
             <div className="row" style={{ marginBottom: 10 }}>
               <strong>
-                第 {from}-{to} 关
+                第 {from}-{to} 天
               </strong>
               <span className="tag grey">
                 {clearedInGroup}/{levels.length}
@@ -89,7 +89,7 @@ export default function Levels({ store, onSelect, onBack }: Props): React.JSX.El
       <div className="card">
         <div className="muted" style={{ fontSize: 13 }}>
           <div style={{ marginBottom: 4 }}>
-            <span className="level cleared inline-legend">1</span> 已通关，可回刷
+            <span className="level cleared inline-legend">1</span> 已完成，可重练
           </div>
           <div style={{ marginBottom: 4 }}>
             <span className="level active inline-legend">2</span> 当前可闯
