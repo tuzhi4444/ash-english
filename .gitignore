@@ -25,3 +25,7 @@ dist-ssr
 
 # Claude Code 本地配置
 .claude/
+
+# 微信开发者工具误开在本目录时生成的配置（小程序版在 ~/Desktop/english-app-mp）
+project.config.json
+project.private.config.json
