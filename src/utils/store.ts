@@ -42,11 +42,14 @@ export function defaultStore(): LearningStore {
       autoSpeak: true,
       speechRate: 1.0,
       preferredVoice: null,
-      dailyNewWords: 20,
-      // 稳态复习量 = 8 × 每日新词数（每个词一生复习 8 次，稳态时投放与到期速率相等）。
-      // 20 词/天 → 每天 160 次复习，上限低于此就会持续积压、反过来拖死新词投放。
-      // 180 留了一点余量。每题约 10 秒 → 单词部分稳态约 30 分钟，占 1 小时的一半。
-      maxReviewPerDay: 180,
+      // 单词改成四模式串联（翻卡→听写→语境→听辨）后，每个词约 45 秒、
+      // 是原来单模式的四倍，原先按 10 秒/词配的 20 新词 + 180 上限已经不成立：
+      // 模拟 300 天，峰值 120 词 ≈ 106 分钟，有 69 天超过 1.5 小时。
+      dailyNewWords: 12,
+      // 上限 180 形同虚设——断更五天积压 140 个也够不着，于是全砸在回来那天。
+      // 降到 60 才让"过载保护"真正生效：超出的顺延到明天，且新词自动暂停到还完债。
+      // 断 5 天回来：180 词/151 分 → 64 词/64 分，峰值不再失控。
+      maxReviewPerDay: 60,
       notificationEnabled: false,
       notificationTime: '20:00',
     },

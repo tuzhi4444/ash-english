@@ -80,6 +80,28 @@ function isLegacy(plan: unknown): plan is LegacyPlan {
   );
 }
 
+/** 四模式串联之前的旧默认值——只有还停在这两个数上的存档才跟着调 */
+const LEGACY_DAILY_NEW = 20;
+const LEGACY_MAX_REVIEW = 180;
+
+/**
+ * 迁移设置项。
+ *
+ * 单词改成四模式串联后每词耗时约翻四倍，旧默认（20 新词 / 上限 180）会让
+ * 峰值到 120 词≈106 分钟，断更后更是顶到 180 词≈151 分钟。新默认是 12 / 60。
+ *
+ * 只有值仍等于旧默认时才改——用户自己调过的数字不动，那是他的选择。
+ */
+function migrateSettings(
+  base: LearningStore['settings'],
+  raw: Partial<LearningStore['settings']> | undefined
+): LearningStore['settings'] {
+  const merged = { ...base, ...(raw ?? {}) };
+  if (merged.dailyNewWords === LEGACY_DAILY_NEW) merged.dailyNewWords = base.dailyNewWords;
+  if (merged.maxReviewPerDay === LEGACY_MAX_REVIEW) merged.maxReviewPerDay = base.maxReviewPerDay;
+  return merged;
+}
+
 /**
  * 把任意版本的存档补齐成当前结构。
  * 原则：宁可保守（进度算少一点），也不能凭空多给通关数。
@@ -94,7 +116,7 @@ export function migrateStore(raw: Partial<LearningStore>): LearningStore {
     dialogue: { ...base.dialogue, ...(raw.dialogue ?? {}) },
     customPassages: raw.customPassages ?? [],
     stats: { ...base.stats, ...(raw.stats ?? {}) },
-    settings: { ...base.settings, ...(raw.settings ?? {}) },
+    settings: migrateSettings(base.settings, raw.settings),
     assessment: { ...base.assessment, ...(raw.assessment ?? {}) },
     plan: base.plan,
   };
